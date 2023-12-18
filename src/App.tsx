@@ -1,5 +1,5 @@
 import './App.css';
-import {InputDropdown, optionListItem} from "./InputDropdown/public";
+import {InputDropdown, optionListItem} from "InputDropdown/public";
 
 function App() {
 
