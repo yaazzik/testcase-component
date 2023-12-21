@@ -42,7 +42,12 @@ function App() {
   ]
 
   return (
-    <InputDropdown initialState={initialState} headerText='Header Text' />
+    <div>
+      <InputDropdown initialState={initialState} headerText='Header Text' />
+      <InputDropdown initialState={initialState} headerText='Header Text' />
+      <InputDropdown initialState={initialState} headerText='Header Text' />
+    </div>
+
   );
 }
 

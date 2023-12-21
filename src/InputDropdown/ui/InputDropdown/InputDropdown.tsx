@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import {ChangeEvent, FormEventHandler, useCallback, useEffect, useRef, useState} from "react";
+import {ChangeEvent, FormEventHandler, useCallback, useEffect, useId, useRef, useState} from "react";
 import { ReactComponent as DetailsIcon } from '../../assets/arrows-up-down-svgrepo-com.svg';
 import {Dropdown} from "../Dropdown/Dropdown";
 import {useClickOutside} from "../../../hooks/useClickOutside";
@@ -26,6 +26,8 @@ export const InputDropdown = (props:InputDropdownProps) => {
   const [isFocused, setIsFocused] = useState<boolean>(false)
   const [hasOptions, setHasOptions] = useState<boolean>(false)
   const [inputData, setInputData] = useState<string>('')
+  const [lastSelected, setLastSelected] = useState<string>('Введите наименование группы...')
+  const inputID = useId();
   const menuRef = useRef(null);
 
   useClickOutside(menuRef, () => {
@@ -39,13 +41,15 @@ export const InputDropdown = (props:InputDropdownProps) => {
   const changeHandler = (e: ChangeEvent<HTMLInputElement>) => setInputData(e.target.value)
 
   const setFocus = () => {
-    const el = document.getElementById('inputDrop');
+    const el = document.getElementById(`inputDrop${inputID}`);
     if (el) el.focus();
   }
 
   const submitHandler: FormEventHandler<HTMLFormElement> = useCallback ((e) => {
     e.preventDefault();
-    if (inputData) {
+    if (inputData &&
+      (!optionList.map(el => el.name.toLowerCase()).includes(inputData.toLowerCase()))
+    ) {
       setOptionList((prev) => {
           const arrayCopy = [...prev];
           arrayCopy.push({
@@ -58,7 +62,7 @@ export const InputDropdown = (props:InputDropdownProps) => {
       )
     }
     setInputData('')
-  }, [inputData])
+  }, [inputData, optionList])
 
   useEffect(() => {
     if (optionList?.length) {
@@ -66,6 +70,8 @@ export const InputDropdown = (props:InputDropdownProps) => {
     }
     else {
       setHasOptions(false)
+      setLastSelected('Введите наименование группы...')
+      setIsFocused(false)
     }
   }, [optionList?.length])
 
@@ -73,21 +79,26 @@ export const InputDropdown = (props:InputDropdownProps) => {
     <form onSubmit={submitHandler} ref={menuRef} className=' w-full h-full flex flex-col text-left'>
       { headerText && <header className='cursor-pointer' onClick={setFocus}>{headerText}</header> }
       <div  className={classNames(
-        'relative flex border-2 rounded justify-between items-center h-full w-full p-2 hover:border-blue-400',
+        'relative flex border-2 rounded justify-between items-center h-full w-full px-2 hover:border-blue-400',
         {
           'border-2 border-blue-700': isFocused
         })
       }>
         <input
-          className={classNames('h-full w-full focus:outline-0', className)}
-          placeholder='Введите наименование группы...'
+          className={classNames('h-full w-full focus:outline-0 placeholder:text-black', className)}
+          placeholder={lastSelected}
           value={inputData}
           onChange={changeHandler}
-          id='inputDrop'
+          id={`inputDrop${inputID}`}
 
         />
-        { hasOptions && <DetailsIcon className='h-10 w-10 z-10 cursor-pointer' onClick={onIconClickHandler} /> }
-        { isFocused && <Dropdown optionList={optionList} setOptionList={setOptionList} /> }
+        <DetailsIcon className={classNames('h-10 w-10 z-10',
+        {
+          'opacity-0 pointer-events-none': !hasOptions,
+          'cursor-pointer opacity-100': hasOptions
+        })
+        } onClick={onIconClickHandler} />
+        { isFocused && <Dropdown optionList={optionList} setOptionList={setOptionList} setLastSelected={setLastSelected} /> }
       </div>
     </form>
   );

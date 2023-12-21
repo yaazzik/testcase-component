@@ -1,9 +1,8 @@
-import { MutableRefObject, useEffect } from "react";
+import { MutableRefObject, useEffect} from "react";
 
-export const useClickOutside = (ref: MutableRefObject<any>, callback: () => void) => {
-  // @ts-ignore
-  const handleClick = (e) => {
-    if (ref.current && !ref.current.contains(e.target)) {
+export const useClickOutside = (ref: MutableRefObject<null | HTMLElement>, callback: () => void) => {
+  const handleClick: EventListenerOrEventListenerObject = (e) => {
+    if (ref.current && !ref.current.contains(e.target as Node)) {
       callback();
     }
   };
