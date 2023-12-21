@@ -19,9 +19,7 @@ function sumBudget(expenditureItem) {
     expenditureItem.map(el => sumBudget(el))
   }
   else {
-    Object.values(expenditureItem).map(el => {
-      sumBudget(el);
-    })
+    Object.values(expenditureItem).map(el => sumBudget(el))
   }
   return summary;
 }
